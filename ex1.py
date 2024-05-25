@@ -4,6 +4,16 @@ import torch
 import numpy
 
 
+def string_to_one_hot(s, char_to_index):
+    if len(char_to_index.keys()) <= 0:
+        return
+    one_hot = torch.zeros(len(s), len(char_to_index.keys()))
+    for i, char in enumerate(s):
+        one_hot[i, char_to_index[char]] = 1.0
+    print(len(one_hot))
+    return one_hot
+
+
 def split_list(input_list, split_ratio=0.9):
     # Shuffle the list to ensure randomness
     shuffled_list = input_list[:]
@@ -29,6 +39,24 @@ def split_string_to_consecutive_sequences(whole_sequence: str, sub_seq_len: int)
     return ret_list
 
 
+class StringClassifier(torch.nn.Module):
+    def __init__(self, input_size, hidden_size, output_size):
+        super(StringClassifier, self).__init__()
+        self.flatten = torch.nn.Flatten()
+        self.fc1 = torch.nn.Linear(input_size, hidden_size)
+        self.relu = torch.nn.ReLU()
+        self.fc2 = torch.nn.Linear(hidden_size, output_size)
+        self.sigmoid = torch.nn.Sigmoid()
+
+    def forward(self, x):
+        x = self.flatten(x)
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.fc2(x)
+        x = self.sigmoid(x)
+        return x
+
+
 def main():
     neg_list, pos_list = list(), list()
     with zipfile.ZipFile("ex1 data", 'r') as zip_ref:
@@ -39,15 +67,14 @@ def main():
             for line in pos:
                 pos_list.append(line.decode())
 
-    data_to_split = neg_list + pos_list
-
     # Getting all the letter representations of the amino acids
+    all_data = neg_list + pos_list
     all_letters = set()
-    for dpoint in data_to_split:
+    for dpoint in all_data:
         for l in dpoint:
             all_letters.add(l)
-    # print(len(all_letters), all_letters)
-
+    char_to_index = {char: idx for idx, char in enumerate(all_letters)}
+    print(char_to_index)
 
 
     # train_data, test_data = split_list(data_to_split)
@@ -58,11 +85,55 @@ def main():
         whole_sent = spike_txt.read()
         # for line in spike_txt:
         #     whole_sent += line
+    # print(len(split_string_to_consecutive_sequences(whole_sent, 9)))
 
-    print(len(whole_sent))
-    print(whole_sent[-1])
-    print(len(split_string_to_consecutive_sequences(whole_sent, 9)))
 
+    # ????????????????????????????????????????????????????????????????????????????????????????????
+    # Example dataset
+    pre_shuffled_data = neg_list + pos_list
+    pre_shuffled_labels = [0]*len(neg_list) + [1]*len(pos_list)
+    paired_list = list(zip(pre_shuffled_data, pre_shuffled_labels))
+    random.shuffle(paired_list)
+    data, labels = zip(*paired_list)
+    data = list(data)
+    labels = list(labels)
+
+    # print(data)
+    # print(labels)
+
+    # Convert the dataset to one-hot embeddings
+    inputs = torch.stack([string_to_one_hot(s, char_to_index) for s in data])
+    targets = torch.tensor(labels, dtype=torch.float32)
+
+    # Neural Network creation and training
+    inputs = torch.stack([string_to_one_hot(s, char_to_index) for s in data])
+    targets = torch.tensor(labels, dtype=torch.float32)
+
+    input_size = 9 * len(char_to_index.keys())  # 9 characters each with a one-hot encoding of length num_chars
+    hidden_size = 128  # Number of hidden units
+    output_size = 1  # Binary output
+
+    model = StringClassifier(input_size, hidden_size, output_size)
+    criterion = torch.nn.BCELoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+
+    # Training loop
+    num_epochs = 100
+
+    for epoch in range(num_epochs):
+        model.train()
+        optimizer.zero_grad()
+
+        outputs = model(inputs)
+        loss = criterion(outputs.squeeze(), targets)
+
+        loss.backward()
+        optimizer.step()
+
+        if (epoch + 1) % 10 == 0:
+            print(f'Epoch [{epoch + 1}/{num_epochs}], Loss: {loss.item():.4f}')
+
+    print("Training complete.")
 
 
 if __name__ == '__main__':
