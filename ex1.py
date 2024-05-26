@@ -77,8 +77,6 @@ def main():
             all_letters.add(l)
     char_to_index = {char: idx for idx, char in enumerate(all_letters)}
 
-
-    # ????????????????????????????????????????????????????????????????????????????????????????????
     # Example dataset
     pre_shuffled_data = neg_list + pos_list
     pre_shuffled_labels = [0]*len(neg_list) + [1]*len(pos_list)
@@ -103,11 +101,12 @@ def main():
 
     model = StringClassifier(input_size, hidden_size, output_size)
     criterion = torch.nn.BCELoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.003)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
+    print("---------------------------------------------------------- Training outputs:")
+    
     # Training loop
     num_epochs = 200
-
     for epoch in range(num_epochs):
         model.train()
         optimizer.zero_grad()
@@ -130,22 +129,22 @@ def main():
     outputs = model(test_inputs)
     loss = criterion(outputs.squeeze(), test_targets)
 
+    print("---------------------------------------------------------- Test outputs:")
     print(f'Test Loss: {loss.item():.4f}')
 
-    whole_sent = ""
+    # Getting results for the given spike protein
     with open("spike.txt", 'r') as spike_txt:
         whole_sent = spike_txt.read()
         spike_txt.close()
 
     spike_data = split_string_to_consecutive_sequences(whole_sent, 9)
-    print(string_to_one_hot(spike_data[0], char_to_index).shape)
+    # print(string_to_one_hot(spike_data[0], char_to_index).shape)
 
-    # Trained Neural Network on test data
     spike_inputs = torch.stack([string_to_one_hot(s, char_to_index) for s in spike_data])
     outputs = model(spike_inputs)
 
-    print("Spike outputs:")
-    print(outputs)
+    print("---------------------------------------------------------- Spike outputs:")
+    print(torch.sum(torch.round(outputs)))
 
 
 if __name__ == '__main__':
