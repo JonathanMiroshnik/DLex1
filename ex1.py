@@ -10,7 +10,6 @@ def string_to_one_hot(s, char_to_index):
     one_hot = torch.zeros(len(s), len(char_to_index.keys()))
     for i, char in enumerate(s):
         one_hot[i, char_to_index[char]] = 1.0
-    print(len(one_hot))
     return one_hot
 
 
@@ -63,9 +62,12 @@ def main():
         with zip_ref.open("ex1 data/neg_A0201.txt", 'r') as neg:
             for line in neg:
                 neg_list.append(line.decode())
+            neg.close()
         with zip_ref.open("ex1 data/pos_A0201.txt", 'r') as pos:
             for line in pos:
                 pos_list.append(line.decode())
+            pos.close()
+        zip_ref.close()
 
     # Getting all the letter representations of the amino acids
     all_data = neg_list + pos_list
@@ -74,18 +76,6 @@ def main():
         for l in dpoint:
             all_letters.add(l)
     char_to_index = {char: idx for idx, char in enumerate(all_letters)}
-    print(char_to_index)
-
-
-    # train_data, test_data = split_list(data_to_split)
-    # print(train_data, test_data)
-
-    whole_sent = ""
-    with open("spike.txt", 'r') as spike_txt:
-        whole_sent = spike_txt.read()
-        # for line in spike_txt:
-        #     whole_sent += line
-    # print(len(split_string_to_consecutive_sequences(whole_sent, 9)))
 
 
     # ????????????????????????????????????????????????????????????????????????????????????????????
@@ -93,21 +83,19 @@ def main():
     pre_shuffled_data = neg_list + pos_list
     pre_shuffled_labels = [0]*len(neg_list) + [1]*len(pos_list)
     paired_list = list(zip(pre_shuffled_data, pre_shuffled_labels))
+
     random.shuffle(paired_list)
-    data, labels = zip(*paired_list)
-    data = list(data)
-    labels = list(labels)
 
-    # print(data)
-    # print(labels)
+    split_train, split_test = split_list(paired_list)
+    split_train_data, split_train_labels = zip(*split_train)
+    split_test_data, split_test_labels = zip(*split_test)
 
-    # Convert the dataset to one-hot embeddings
-    inputs = torch.stack([string_to_one_hot(s, char_to_index) for s in data])
-    targets = torch.tensor(labels, dtype=torch.float32)
+    split_train_data, split_train_labels = list(split_train_data), list(split_train_labels)
+    split_test_data, split_test_labels = list(split_test_data), list(split_test_labels)
 
     # Neural Network creation and training
-    inputs = torch.stack([string_to_one_hot(s, char_to_index) for s in data])
-    targets = torch.tensor(labels, dtype=torch.float32)
+    inputs = torch.stack([string_to_one_hot(s.replace('\n', ''), char_to_index) for s in split_train_data])
+    targets = torch.tensor(split_train_labels, dtype=torch.float32)
 
     input_size = 9 * len(char_to_index.keys())  # 9 characters each with a one-hot encoding of length num_chars
     hidden_size = 128  # Number of hidden units
@@ -115,10 +103,10 @@ def main():
 
     model = StringClassifier(input_size, hidden_size, output_size)
     criterion = torch.nn.BCELoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.003)
 
     # Training loop
-    num_epochs = 100
+    num_epochs = 200
 
     for epoch in range(num_epochs):
         model.train()
@@ -134,6 +122,30 @@ def main():
             print(f'Epoch [{epoch + 1}/{num_epochs}], Loss: {loss.item():.4f}')
 
     print("Training complete.")
+
+    # Trained Neural Network on test data
+    test_inputs = torch.stack([string_to_one_hot(s.replace('\n', ''), char_to_index) for s in split_test_data])
+    test_targets = torch.tensor(split_test_labels, dtype=torch.float32)
+
+    outputs = model(test_inputs)
+    loss = criterion(outputs.squeeze(), test_targets)
+
+    print(f'Test Loss: {loss.item():.4f}')
+
+    whole_sent = ""
+    with open("spike.txt", 'r') as spike_txt:
+        whole_sent = spike_txt.read()
+        spike_txt.close()
+
+    spike_data = split_string_to_consecutive_sequences(whole_sent, 9)
+    print(string_to_one_hot(spike_data[0], char_to_index).shape)
+
+    # Trained Neural Network on test data
+    spike_inputs = torch.stack([string_to_one_hot(s, char_to_index) for s in spike_data])
+    outputs = model(spike_inputs)
+
+    print("Spike outputs:")
+    print(outputs)
 
 
 if __name__ == '__main__':
