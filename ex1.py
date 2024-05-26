@@ -5,6 +5,11 @@ import numpy
 
 
 def string_to_one_hot(s, char_to_index):
+    """
+    :param s: string to make one-hot embedding of
+    :param char_to_index: dictionary with char key to one-hot index position
+    :return: One hot embedding of string of one-hot character representations
+    """
     if len(char_to_index.keys()) <= 0:
         return
     one_hot = torch.zeros(len(s), len(char_to_index.keys()))
@@ -14,6 +19,12 @@ def string_to_one_hot(s, char_to_index):
 
 
 def split_list(input_list, split_ratio=0.9):
+    """
+    Shuffle and split list into two lists of percentage size according to split_ratio
+    :param input_list: input list to shuffle and split
+    :param split_ratio: Percentage size of first list
+    :return: two lists of percentage size according to split_ratio
+    """
     # Shuffle the list to ensure randomness
     shuffled_list = input_list[:]
     random.shuffle(shuffled_list)
@@ -30,6 +41,12 @@ def split_list(input_list, split_ratio=0.9):
 
 # Part e
 def split_string_to_consecutive_sequences(whole_sequence: str, sub_seq_len: int):
+    """
+    Splits string to all consecutive sub-strings of length sub_seq_len
+    :param whole_sequence: string to split
+    :param sub_seq_len: length of sub-strings
+    :return: list of sub strings of sub_seq_len
+    """
     if sub_seq_len > len(whole_sequence):
         return
     ret_list = list()
@@ -72,17 +89,16 @@ def main():
     # Getting all the letter representations of the amino acids
     all_data = neg_list + pos_list
     all_letters = set()
-    for dpoint in all_data:
-        for l in dpoint:
-            all_letters.add(l)
+    for d_point in all_data:
+        for label in d_point:
+            all_letters.add(label)
     char_to_index = {char: idx for idx, char in enumerate(all_letters)}
 
-    # Example dataset
+    # Creating and shuffling train/test data
     pre_shuffled_data = neg_list + pos_list
     pre_shuffled_labels = [0]*len(neg_list) + [1]*len(pos_list)
+    print(len(pre_shuffled_labels), len(pre_shuffled_data))
     paired_list = list(zip(pre_shuffled_data, pre_shuffled_labels))
-
-    random.shuffle(paired_list)
 
     split_train, split_test = split_list(paired_list)
     split_train_data, split_train_labels = zip(*split_train)
@@ -92,8 +108,8 @@ def main():
     split_test_data, split_test_labels = list(split_test_data), list(split_test_labels)
 
     # Neural Network creation and training
-    inputs = torch.stack([string_to_one_hot(s.replace('\n', ''), char_to_index) for s in split_train_data])
-    targets = torch.tensor(split_train_labels, dtype=torch.float32)
+    train_inputs = torch.stack([string_to_one_hot(s.replace('\n', ''), char_to_index) for s in split_train_data])
+    train_targets = torch.tensor(split_train_labels, dtype=torch.float32)
 
     input_size = 9 * len(char_to_index.keys())  # 9 characters each with a one-hot encoding of length num_chars
     hidden_size = 128  # Number of hidden units
@@ -104,15 +120,15 @@ def main():
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
     print("---------------------------------------------------------- Training outputs:")
-    
+
     # Training loop
     num_epochs = 200
     for epoch in range(num_epochs):
         model.train()
         optimizer.zero_grad()
 
-        outputs = model(inputs)
-        loss = criterion(outputs.squeeze(), targets)
+        outputs = model(train_inputs)
+        loss = criterion(outputs.squeeze(), train_targets)
 
         loss.backward()
         optimizer.step()
@@ -138,9 +154,8 @@ def main():
         spike_txt.close()
 
     spike_data = split_string_to_consecutive_sequences(whole_sent, 9)
-    # print(string_to_one_hot(spike_data[0], char_to_index).shape)
-
     spike_inputs = torch.stack([string_to_one_hot(s, char_to_index) for s in spike_data])
+
     outputs = model(spike_inputs)
 
     print("---------------------------------------------------------- Spike outputs:")
