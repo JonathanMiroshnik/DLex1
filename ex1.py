@@ -1,7 +1,12 @@
 import zipfile
 import random
 import torch
+import heapq
 import numpy
+import matplotlib.pyplot as plt
+
+import os
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 
 def string_to_one_hot(s, char_to_index):
@@ -55,6 +60,33 @@ def split_string_to_consecutive_sequences(whole_sequence: str, sub_seq_len: int)
     return ret_list
 
 
+def make_train_test_graph(train_loss, test_loss):
+    """
+    Graphs the train and test loss over the epochs
+    :param train_loss: train loss list
+    :param test_loss: test loss list
+    """
+    if len(train_loss) != len(test_loss):
+        return
+
+    # Create a list of indices
+    indices = list(range(len(train_loss)))
+
+    # Plot the data
+    plt.figure(figsize=(10, 5))
+    plt.plot(indices, train_loss, label='Train loss')
+    plt.plot(indices, test_loss, label='Test loss')
+
+    # Add labels and title
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.title('Train and test loss by epoch')
+    plt.legend()
+
+    # Show the plot
+    plt.show()
+
+
 class StringClassifier(torch.nn.Module):
     def __init__(self, input_size, hidden_size, output_size):
         super(StringClassifier, self).__init__()
@@ -97,7 +129,6 @@ def main():
     # Creating and shuffling train/test data
     pre_shuffled_data = neg_list + pos_list
     pre_shuffled_labels = [0]*len(neg_list) + [1]*len(pos_list)
-    print(len(pre_shuffled_labels), len(pre_shuffled_data))
     paired_list = list(zip(pre_shuffled_data, pre_shuffled_labels))
 
     split_train, split_test = split_list(paired_list)
@@ -111,18 +142,23 @@ def main():
     train_inputs = torch.stack([string_to_one_hot(s.replace('\n', ''), char_to_index) for s in split_train_data])
     train_targets = torch.tensor(split_train_labels, dtype=torch.float32)
 
+    test_inputs = torch.stack([string_to_one_hot(s.replace('\n', ''), char_to_index) for s in split_test_data])
+    test_targets = torch.tensor(split_test_labels, dtype=torch.float32)
+
     input_size = 9 * len(char_to_index.keys())  # 9 characters each with a one-hot encoding of length num_chars
-    hidden_size = 128  # Number of hidden units
+    hidden_size = 180  # Number of hidden units
     output_size = 1  # Binary output
 
     model = StringClassifier(input_size, hidden_size, output_size)
     criterion = torch.nn.BCELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
-    print("---------------------------------------------------------- Training outputs:")
+    print("-------------------------------------------------------- Training outputs:")
+
+    train_loss, test_loss = list(), list()
 
     # Training loop
-    num_epochs = 200
+    num_epochs = 500
     for epoch in range(num_epochs):
         model.train()
         optimizer.zero_grad()
@@ -130,36 +166,55 @@ def main():
         outputs = model(train_inputs)
         loss = criterion(outputs.squeeze(), train_targets)
 
+        train_loss.append(float(loss))
+
         loss.backward()
         optimizer.step()
 
         if (epoch + 1) % 10 == 0:
             print(f'Epoch [{epoch + 1}/{num_epochs}], Loss: {loss.item():.4f}')
 
+        outputs = model(test_inputs)
+        loss = criterion(outputs.squeeze(), test_targets)
+
+        test_loss.append(float(loss))
+
     print("Training complete.")
 
     # Trained Neural Network on test data
-    test_inputs = torch.stack([string_to_one_hot(s.replace('\n', ''), char_to_index) for s in split_test_data])
-    test_targets = torch.tensor(split_test_labels, dtype=torch.float32)
-
     outputs = model(test_inputs)
     loss = criterion(outputs.squeeze(), test_targets)
 
-    print("---------------------------------------------------------- Test outputs:")
-    print(f'Test Loss: {loss.item():.4f}')
+    print("-------------------------------------------------------- Test outputs:\n" + f'Test Loss: {loss.item():.4f}')
 
     # Getting results for the given spike protein
     with open("spike.txt", 'r') as spike_txt:
         whole_sent = spike_txt.read()
         spike_txt.close()
+    whole_sent = whole_sent.replace('\n', '')
 
     spike_data = split_string_to_consecutive_sequences(whole_sent, 9)
     spike_inputs = torch.stack([string_to_one_hot(s, char_to_index) for s in spike_data])
 
     outputs = model(spike_inputs)
 
-    print("---------------------------------------------------------- Spike outputs:")
-    print(torch.sum(torch.round(outputs)))
+    print("-------------------------------------------------------- Spike outputs:")
+    # Spike dictionary takes the peptide as the key and gives a tuple of type (number_of_occurrences, average)
+    spike_dict = dict()
+    for i, s in enumerate(spike_data):
+        if s not in spike_dict.keys():
+            spike_dict[s] = (1, outputs[i])
+        else:
+            cur_num_occur, cur_avg = spike_dict[s]
+            spike_dict[s] = (cur_num_occur+1, (cur_avg * cur_num_occur + outputs[i]) / (cur_num_occur+1))
+
+    # Finding the 3 most correlated peptides from the spike protein(the 3 highest averages from the dictionary)
+    best_peptides = heapq.nlargest(3, spike_dict.items(), key=lambda item: item[1][1])
+    best_peptides = [item[0] for item in best_peptides]
+
+    print("The best peptides for prediction are:\n" + str(best_peptides))
+
+    make_train_test_graph(train_loss, test_loss)
 
 
 if __name__ == '__main__':
