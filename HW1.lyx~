@@ -118,7 +118,15 @@ Practical Part:
 
 \begin_layout Standard
 2.d.
- The totally linear model(similar to the previous one, without the middle
+ The final test loss result is: 
+\begin_inset Formula $0.1562$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The totally linear model(similar to the previous one, without the middle
  ReLU layer) learns the problem well, but stops bettering itself through
  training at a former phase.
 \end_layout
