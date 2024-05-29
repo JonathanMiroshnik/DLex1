@@ -149,7 +149,7 @@ def main():
 
     model = StringClassifier(input_size, hidden_size, output_size)
 
-    weights = torch.tensor([0.9])
+    weights = torch.tensor([9])
     # criterion = torch.nn.BCELoss(weight=weights)
     criterion = torch.nn.BCEWithLogitsLoss(pos_weight=weights)
 
