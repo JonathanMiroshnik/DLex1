@@ -81,6 +81,55 @@ Exercise 1 Intro to Deep Learning: Nadav Eisen & Yonatan Miroshnik
 \end_layout
 
 \begin_layout Part*
+Practical Part:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $ $
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+2.a.
+ For every character in the 9 character peptide, I gave it a unique index,
+ and from that I created a one-hot embedding for each character based on
+ this unique index.
+ Each 9 character length peptide is thus represented by a 180 bit long binary
+ number of the consecutive one-hot embeddings of each character in the peptide.
+\end_layout
+
+\begin_layout Standard
+2.b.
+ The input dimension, as explained above, is a 180 bit long input.
+ The offered neural network set up has a problem in our need to decide the
+ size of the hidden layers and thus the number of weights.
+\end_layout
+
+\begin_layout Standard
+2.c.
+ 
+\end_layout
+
+\begin_layout Standard
+2.d.
+ 
+\end_layout
+
+\begin_layout Standard
+2.e.
+ We first go over the spike protein as given and divide it into all possible
+ consecutive 9-peptides, we then pass it through the trained network, and
+ return the most confidently positive peptides of the prediction, our resulting
+ peptides are: 
+\begin_inset Formula $ $
+\end_inset
+
+??
+\end_layout
+
+\begin_layout Part*
 Question 1:
 \end_layout
 

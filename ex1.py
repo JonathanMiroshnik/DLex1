@@ -2,9 +2,7 @@ import zipfile
 import random
 import torch
 import heapq
-import numpy
 import matplotlib.pyplot as plt
-
 import os
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
@@ -92,16 +90,16 @@ class StringClassifier(torch.nn.Module):
         super(StringClassifier, self).__init__()
         self.flatten = torch.nn.Flatten()
         self.fc1 = torch.nn.Linear(input_size, hidden_size)
-        self.relu = torch.nn.ReLU()
+        # self.relu = torch.nn.ReLU()
         self.fc2 = torch.nn.Linear(hidden_size, output_size)
-        self.sigmoid = torch.nn.Sigmoid()
+        # self.sigmoid = torch.nn.Sigmoid()
 
     def forward(self, x):
         x = self.flatten(x)
         x = self.fc1(x)
-        x = self.relu(x)
+        # x = self.relu(x)
         x = self.fc2(x)
-        x = self.sigmoid(x)
+        # x = self.sigmoid(x)
         return x
 
 
@@ -150,7 +148,11 @@ def main():
     output_size = 1  # Binary output
 
     model = StringClassifier(input_size, hidden_size, output_size)
-    criterion = torch.nn.BCELoss()
+
+    weights = torch.tensor([0.9])
+    # criterion = torch.nn.BCELoss(weight=weights)
+    criterion = torch.nn.BCEWithLogitsLoss(pos_weight=weights)
+
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
     print("-------------------------------------------------------- Training outputs:")
@@ -158,12 +160,14 @@ def main():
     train_loss, test_loss = list(), list()
 
     # Training loop
-    num_epochs = 500
+    num_epochs = 300
     for epoch in range(num_epochs):
         model.train()
         optimizer.zero_grad()
 
         outputs = model(train_inputs)
+
+        # outputs.squeeze()
         loss = criterion(outputs.squeeze(), train_targets)
 
         train_loss.append(float(loss))
@@ -175,6 +179,8 @@ def main():
             print(f'Epoch [{epoch + 1}/{num_epochs}], Loss: {loss.item():.4f}')
 
         outputs = model(test_inputs)
+
+        # outputs.squeeze()
         loss = criterion(outputs.squeeze(), test_targets)
 
         test_loss.append(float(loss))
@@ -183,6 +189,8 @@ def main():
 
     # Trained Neural Network on test data
     outputs = model(test_inputs)
+
+    # outputs.squeeze()
     loss = criterion(outputs.squeeze(), test_targets)
 
     print("-------------------------------------------------------- Test outputs:\n" + f'Test Loss: {loss.item():.4f}')
