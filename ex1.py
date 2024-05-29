@@ -90,16 +90,14 @@ class StringClassifier(torch.nn.Module):
         super(StringClassifier, self).__init__()
         self.flatten = torch.nn.Flatten()
         self.fc1 = torch.nn.Linear(input_size, hidden_size)
-        # self.relu = torch.nn.ReLU()
+        self.relu = torch.nn.ReLU()
         self.fc2 = torch.nn.Linear(hidden_size, output_size)
-        # self.sigmoid = torch.nn.Sigmoid()
 
     def forward(self, x):
         x = self.flatten(x)
         x = self.fc1(x)
         # x = self.relu(x)
         x = self.fc2(x)
-        # x = self.sigmoid(x)
         return x
 
 
@@ -149,8 +147,7 @@ def main():
 
     model = StringClassifier(input_size, hidden_size, output_size)
 
-    weights = torch.tensor([9])
-    # criterion = torch.nn.BCELoss(weight=weights)
+    weights = torch.tensor([0.9])
     criterion = torch.nn.BCEWithLogitsLoss(pos_weight=weights)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)

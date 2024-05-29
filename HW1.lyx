@@ -104,17 +104,31 @@ Practical Part:
 2.b.
  The input dimension, as explained above, is a 180 bit long input.
  The offered neural network set up has a problem in our need to decide the
- size of the hidden layers and thus the number of weights.
+ size of the hidden layers and thus the number of weights, if we decide
+ on a hidden linear layer size similar to the input, we start seeing overfitting
+ at some point.
+ 
 \end_layout
 
 \begin_layout Standard
 2.c.
- 
+ We propose reducing the hidden layer size to 128, this makes the model
+ overfit less and thus produces better training results.
 \end_layout
 
 \begin_layout Standard
 2.d.
- 
+ The final test loss result is: 
+\begin_inset Formula $0.1562$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The totally linear model(similar to the previous one, without the middle
+ ReLU layer) learns the problem well, but stops bettering itself through
+ training at a former phase.
 \end_layout
 
 \begin_layout Standard
@@ -796,7 +810,18 @@ b)
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\frac{d}{dx}\left(f_{1}\left(f_{2}\left(...f_{n}\left(x\right)\right)\right)\right)=f`_{1}\left(f_{2}\left(...f_{n}\left(x\right)\right)\right)\left(\frac{d}{dx}\left(f_{2}\left(...f_{n}\left(x\right)\right)\right)\right)=f`_{1}\left(f_{2}\left(...f_{n}\left(x\right)\right)\right)\left(f_{2}`\left(...f_{n}\left(x\right)\right)\right)\left(\frac{d}{dx}\left(f_{3}\left(...f_{n}\left(x\right)\right)\right)\right)=...
+\frac{d}{dx}\left(f_{1}\left(f_{2}\left(...f_{n}\left(x\right)\right)\right)\right)=f`_{1}\left(f_{2}\left(...f_{n}\left(x\right)\right)\right)\left(\frac{d}{dx}\left(f_{2}\left(...f_{n}\left(x\right)\right)\right)\right)=
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+=f`_{1}\left(f_{2}\left(...f_{n}\left(x\right)\right)\right)\left(f_{2}`\left(...f_{n}\left(x\right)\right)\right)\left(\frac{d}{dx}\left(f_{3}\left(...f_{n}\left(x\right)\right)\right)\right)=...
 \]
 
 \end_inset
@@ -822,7 +847,18 @@ c)
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\frac{d}{dx}\left(f_{1}\left(x,f_{2}\left(x,...f_{n-1}\left(x,f_{n}\left(x\right)\right)\right)\right)\right)=\frac{d\left(f_{1}\left(x,f_{2}\left(x,...f_{n-1}\left(x,f_{n}\left(x\right)\right)\right)\right)\right)}{d\left(x,f_{2}\left(x,...f_{n-1}\left(x,f_{n}\left(x\right)\right)\right)\right)}\frac{d\left(x,f_{2}\left(x,...f_{n-1}\left(x,f_{n}\left(x\right)\right)\right)\right)}{dx}
+\frac{d}{dx}\left(f_{1}\left(x,f_{2}\left(x,...f_{n-1}\left(x,f_{n}\left(x\right)\right)\right)\right)\right)=
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+=\frac{d\left(f_{1}\left(x,f_{2}\left(x,...f_{n-1}\left(x,f_{n}\left(x\right)\right)\right)\right)\right)}{d\left(x,f_{2}\left(x,...f_{n-1}\left(x,f_{n}\left(x\right)\right)\right)\right)}\frac{d\left(x,f_{2}\left(x,...f_{n-1}\left(x,f_{n}\left(x\right)\right)\right)\right)}{dx}=
 \]
 
 \end_inset
@@ -846,7 +882,7 @@ c)
 \begin_layout Standard
 \begin_inset Formula 
 \[
-=\left(\left(\nabla f_{1}\right)_{\left(x,f_{2}\left(x,...f_{n-1}\left(x,f_{n}\left(x\right)\right)\right)\right)}\right)_{1}+\left(\left(\nabla f_{1}\right)_{\left(x,f_{2}\left(x,...f_{n-1}\left(x,f_{n}\left(x\right)\right)\right)\right)}\right)_{2}\left(\frac{d}{dx}\left(f_{2}\left(x,...f_{n-1}\left(x,f_{n}\left(x\right)\right)\right)\right)\right)=...
+=\left(\left(\nabla f_{1}\right)_{\left(x,f_{2}\left(x,...f_{n-1}\left(x,f_{n}\left(x\right)\right)\right)\right)}\right)_{1}+
 \]
 
 \end_inset
@@ -857,7 +893,40 @@ c)
 \begin_layout Standard
 \begin_inset Formula 
 \[
-...=\left(\left(\nabla f_{1}\right)_{\left(x,f_{2}\left(x,...f_{n-1}\left(x,f_{n}\left(x\right)\right)\right)\right)}\right)_{1}+\left(\left(\nabla f_{1}\right)_{\left(x,f_{2}\left(x,...f_{n-1}\left(x,f_{n}\left(x\right)\right)\right)\right)}\right)_{2}\left(\left(\left(\nabla f_{2}\right)_{\left(x,f_{3}\left(x,...f_{n-1}\left(x,f_{n}\left(x\right)\right)\right)\right)}\right)_{1}+\left(\left(\nabla f_{2}\right)_{\left(x,f_{3}\left(x,...f_{n-1}\left(x,f_{n}\left(x\right)\right)\right)\right)}\right)_{2}\left(...+\left(\left(\nabla f_{n-1}\right)_{\left(x,f_{n}\left(x\right)\right)}\right)_{1}+\left(\left(\nabla f_{n-1}\right)_{\left(x,f_{n}\left(x\right)\right)}\right)_{2}f_{n}`\left(x\right)\right)\right)
++\left(\left(\nabla f_{1}\right)_{\left(x,f_{2}\left(x,...f_{n-1}\left(x,f_{n}\left(x\right)\right)\right)\right)}\right)_{2}\left(\frac{d}{dx}\left(f_{2}\left(x,...f_{n-1}\left(x,f_{n}\left(x\right)\right)\right)\right)\right)=...
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+...=\left(\left(\nabla f_{1}\right)_{\left(x,f_{2}\left(x,...f_{n-1}\left(x,f_{n}\left(x\right)\right)\right)\right)}\right)_{1}+\left(\left(\nabla f_{1}\right)_{\left(x,f_{2}\left(x,...f_{n-1}\left(x,f_{n}\left(x\right)\right)\right)\right)}\right)_{2}\cdot
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\cdot\left(\left(\nabla f_{2}\right)_{\left(x,f_{3}\left(x,...f_{n-1}\left(x,f_{n}\left(x\right)\right)\right)\right)}\right)_{1}+
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
++\left(\left(\nabla f_{2}\right)_{\left(x,f_{3}\left(x,...f_{n-1}\left(x,f_{n}\left(x\right)\right)\right)\right)}\right)_{2}\left(...+\left(\left(\nabla f_{n-1}\right)_{\left(x,f_{n}\left(x\right)\right)}\right)_{1}+\left(\left(\nabla f_{n-1}\right)_{\left(x,f_{n}\left(x\right)\right)}\right)_{2}f_{n}`\left(x\right)\right)
 \]
 
 \end_inset
@@ -883,7 +952,18 @@ d)
 \begin_layout Standard
 \begin_inset Formula 
 \[
-=f`\left(x+g\left(x+h\left(x\right)\right)\right)\left(1+\frac{d}{dx}g\left(x+h\left(x\right)\right)\right)=f`\left(x+g\left(x+h\left(x\right)\right)\right)\left(1+\frac{dg\left(x+h\left(x\right)\right)}{d\left(x+h\left(x\right)\right)}\frac{d\left(x+h\left(x\right)\right)}{dx}\right)
+=f`\left(x+g\left(x+h\left(x\right)\right)\right)\left(1+\frac{d}{dx}g\left(x+h\left(x\right)\right)\right)=
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+=f`\left(x+g\left(x+h\left(x\right)\right)\right)\left(1+\frac{dg\left(x+h\left(x\right)\right)}{d\left(x+h\left(x\right)\right)}\frac{d\left(x+h\left(x\right)\right)}{dx}\right)=
 \]
 
 \end_inset
