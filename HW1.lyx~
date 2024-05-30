@@ -107,12 +107,12 @@ Practical Part:
  size of the hidden layers and thus the number of weights, if we decide
  on a hidden linear layer size similar to the input, we start seeing overfitting
  at some point.
- 
+ The loss began to trail off at 0.15
 \end_layout
 
 \begin_layout Standard
 \begin_inset Graphics
-	filename C:/Users/USER/Desktop/New folder/dlex1A.png
+	filename dl1B.png
 	scale 35
 
 \end_inset
@@ -122,14 +122,29 @@ Practical Part:
 
 \begin_layout Standard
 2.c.
- We propose reducing the hidden layer size to 128, this makes the model
- overfit less and thus produces better training results.
+ We propose reducing the hidden layer size to 30, this makes the model overfit
+ less and thus produces better training results.
+ The final test loss being 
+\begin_inset Formula $0.1492$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename dl1C.png
+	scale 35
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 2.d.
  The final test loss result is: 
-\begin_inset Formula $0.1439$
+\begin_inset Formula $0.1555$
 \end_inset
 
 
@@ -143,7 +158,7 @@ The totally linear model(similar to the previous one, without the middle
 
 \begin_layout Standard
 \begin_inset Graphics
-	filename C:/Users/USER/Desktop/DLex1D.png
+	filename dl1D.png
 	scale 35
 
 \end_inset

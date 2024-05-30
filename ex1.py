@@ -91,13 +91,17 @@ class StringClassifier(torch.nn.Module):
         self.flatten = torch.nn.Flatten()
         self.fc1 = torch.nn.Linear(input_size, hidden_size)
         self.relu = torch.nn.ReLU()
-        self.fc2 = torch.nn.Linear(hidden_size, output_size)
+        self.fc2 = torch.nn.Linear(hidden_size, hidden_size)
+        self.relu2 = torch.nn.ReLU()
+        self.fc3 = torch.nn.Linear(hidden_size, output_size)
 
     def forward(self, x):
         x = self.flatten(x)
         x = self.fc1(x)
         x = self.relu(x)
         x = self.fc2(x)
+        x = self.relu2(x)
+        x = self.fc3(x)
         return x
 
 
@@ -142,7 +146,7 @@ def main():
     test_targets = torch.tensor(split_test_labels, dtype=torch.float32)
 
     input_size = 9 * len(char_to_index.keys())  # 9 characters each with a one-hot encoding of length num_chars
-    hidden_size = 180  # Number of hidden units
+    hidden_size = 30  # Number of hidden units
     output_size = 1  # Binary output
 
     model = StringClassifier(input_size, hidden_size, output_size)
