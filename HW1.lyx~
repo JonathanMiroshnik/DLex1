@@ -633,10 +633,6 @@ Therefore, the maximal learning rate is
  is unbounded.
 \end_layout
 
-\begin_layout Standard
-
-\end_layout
-
 \begin_layout Section*
 c)
 \end_layout
@@ -911,7 +907,7 @@ c)
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\cdot\left(\left(\nabla f_{2}\right)_{\left(x,f_{3}\left(x,...f_{n-1}\left(x,f_{n}\left(x\right)\right)\right)\right)}\right)_{1}+
+(\left(\left(\nabla f_{2}\right)_{\left(x,f_{3}\left(x,...f_{n-1}\left(x,f_{n}\left(x\right)\right)\right)\right)}\right)_{1}+
 \]
 
 \end_inset
@@ -922,7 +918,7 @@ c)
 \begin_layout Standard
 \begin_inset Formula 
 \[
-+\left(\left(\nabla f_{2}\right)_{\left(x,f_{3}\left(x,...f_{n-1}\left(x,f_{n}\left(x\right)\right)\right)\right)}\right)_{2}\left(...+\left(\left(\nabla f_{n-1}\right)_{\left(x,f_{n}\left(x\right)\right)}\right)_{1}+\left(\left(\nabla f_{n-1}\right)_{\left(x,f_{n}\left(x\right)\right)}\right)_{2}f_{n}`\left(x\right)\right)
++\left(\left(\nabla f_{2}\right)_{\left(x,f_{3}\left(x,...f_{n-1}\left(x,f_{n}\left(x\right)\right)\right)\right)}\right)_{2}\left(...+\left(\left(\nabla f_{n-1}\right)_{\left(x,f_{n}\left(x\right)\right)}\right)_{1}+\left(\left(\nabla f_{n-1}\right)_{\left(x,f_{n}\left(x\right)\right)}\right)_{2}f_{n}`\left(x\right)\right))
 \]
 
 \end_inset

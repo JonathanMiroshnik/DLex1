@@ -96,7 +96,7 @@ class StringClassifier(torch.nn.Module):
     def forward(self, x):
         x = self.flatten(x)
         x = self.fc1(x)
-        # x = self.relu(x)
+        x = self.relu(x)
         x = self.fc2(x)
         return x
 
