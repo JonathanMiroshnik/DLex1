@@ -112,7 +112,7 @@ Practical Part:
 
 \begin_layout Standard
 \begin_inset Graphics
-	filename C:/Users/USER/Desktop/New folder/dlex1A.png
+	filename dlex1A.png
 	scale 35
 
 \end_inset
@@ -129,7 +129,7 @@ Practical Part:
 \begin_layout Standard
 2.d.
  The final test loss result is: 
-\begin_inset Formula $0.1562$
+\begin_inset Formula $0.1439$
 \end_inset
 
 
@@ -143,7 +143,7 @@ The totally linear model(similar to the previous one, without the middle
 
 \begin_layout Standard
 \begin_inset Graphics
-	filename C:/Users/USER/Desktop/DLex1D.png
+	filename DLex1D.png
 	scale 35
 
 \end_inset
@@ -156,11 +156,7 @@ The totally linear model(similar to the previous one, without the middle
  We first go over the spike protein as given and divide it into all possible
  consecutive 9-peptides, we then pass it through the trained network, and
  return the most confidently positive peptides of the prediction, our resulting
- peptides are: 
-\begin_inset Formula $ $
-\end_inset
-
-??
+ peptides are: NLREFVFKN, LLIVNNATN, FDNPVLPFN
 \end_layout
 
 \begin_layout Part*

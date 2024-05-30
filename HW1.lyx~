@@ -111,6 +111,16 @@ Practical Part:
 \end_layout
 
 \begin_layout Standard
+\begin_inset Graphics
+	filename C:/Users/USER/Desktop/New folder/dlex1A.png
+	scale 35
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 2.c.
  We propose reducing the hidden layer size to 128, this makes the model
  overfit less and thus produces better training results.
@@ -119,7 +129,7 @@ Practical Part:
 \begin_layout Standard
 2.d.
  The final test loss result is: 
-\begin_inset Formula $0.1562$
+\begin_inset Formula $0.1439$
 \end_inset
 
 
@@ -132,15 +142,21 @@ The totally linear model(similar to the previous one, without the middle
 \end_layout
 
 \begin_layout Standard
+\begin_inset Graphics
+	filename C:/Users/USER/Desktop/DLex1D.png
+	scale 35
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 2.e.
  We first go over the spike protein as given and divide it into all possible
  consecutive 9-peptides, we then pass it through the trained network, and
  return the most confidently positive peptides of the prediction, our resulting
- peptides are: 
-\begin_inset Formula $ $
-\end_inset
-
-??
+ peptides are: NLREFVFKN, LLIVNNATN, FDNPVLPFN
 \end_layout
 
 \begin_layout Part*
