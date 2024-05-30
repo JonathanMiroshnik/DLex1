@@ -804,6 +804,19 @@ This is a smooth function with a very intuitive geometric meaning: we know
 
 \end_layout
 
+\begin_layout Standard
+Therefore, the psuedo-code for this loss is:
+\end_layout
+
+\begin_layout Enumerate
+AngLoss(predicted, actual):
+\end_layout
+
+\begin_layout Enumerate
+return (math.sin(predicted) - math.sin(actual))**2 + (math.cos(predicted) -
+ math.cos(actual))**2
+\end_layout
+
 \begin_layout Part*
 Question 4:
 \end_layout
@@ -938,7 +951,7 @@ c)
 \begin_layout Standard
 \begin_inset Formula 
 \[
-(\left(\left(\nabla f_{2}\right)_{\left(x,f_{3}\left(x,...f_{n-1}\left(x,f_{n}\left(x\right)\right)\right)\right)}\right)_{1}+
+\cdot(\left(\left(\nabla f_{2}\right)_{\left(x,f_{3}\left(x,...f_{n-1}\left(x,f_{n}\left(x\right)\right)\right)\right)}\right)_{1}+
 \]
 
 \end_inset

@@ -171,7 +171,7 @@ The totally linear model(similar to the previous one, without the middle
  We first go over the spike protein as given and divide it into all possible
  consecutive 9-peptides, we then pass it through the trained network, and
  return the most confidently positive peptides of the prediction, our resulting
- peptides are: NLREFVFKN, LLIVNNATN, FDNPVLPFN
+ peptides are: NLREFVFKN, ALLAGTITS, LLIVNNATN
 \end_layout
 
 \begin_layout Part*
@@ -938,7 +938,7 @@ c)
 \begin_layout Standard
 \begin_inset Formula 
 \[
-(\left(\left(\nabla f_{2}\right)_{\left(x,f_{3}\left(x,...f_{n-1}\left(x,f_{n}\left(x\right)\right)\right)\right)}\right)_{1}+
+\cdot(\left(\left(\nabla f_{2}\right)_{\left(x,f_{3}\left(x,...f_{n-1}\left(x,f_{n}\left(x\right)\right)\right)\right)}\right)_{1}+
 \]
 
 \end_inset
